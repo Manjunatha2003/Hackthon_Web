@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tech-ಶೋಧ | A Hackathon for a Brighter Tomorrow</title>
+<meta name="description" content="Tech-ಶೋಧ — a hackathon by VVCE, Mysuru. Explore. Build. Solve. Evolve.">
+<link rel="icon" href="assets/logo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#07050d; --bg-soft:#0c0a16; --panel:#100d1c;
+    --line:rgba(255,255,255,.09);
+    --cyan:#3ee6f2; --violet:#9b6bff; --magenta:#ff5fa8; --amber:#ffc857; --blue:#3d7eff;
+    --ink:#f4f2fb; --muted:#a2a2c0;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif;margin:0;letter-spacing:-.01em;}
+  p{margin:0;} a{color:inherit;text-decoration:none;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .wrap{max-width:1140px;margin:0 auto;padding:0 24px;}
+  img{max-width:100%;display:block;}
+
+  /* ---- layered background art ---- */
+  .bg-layer{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:var(--bg);}
+  .bg-canvas{position:absolute;inset:0;}
+  .bg-vignette{position:absolute;inset:0;background:radial-gradient(ellipse 70% 55% at 50% 30%,transparent 40%,var(--bg) 92%);}
+  .blob{position:absolute;border-radius:50%;filter:blur(110px);opacity:.32;animation:drift 22s ease-in-out infinite;}
+  .b1{width:620px;height:620px;top:-220px;left:-160px;background:var(--blue);}
+  .b2{width:520px;height:520px;top:10%;right:-180px;background:var(--violet);animation-delay:-6s;}
+  .b3{width:560px;height:560px;bottom:-260px;left:20%;background:var(--magenta);animation-delay:-13s;opacity:.2;}
+  @keyframes drift{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(40px,-30px) scale(1.12);}}
+
+  header{position:fixed;top:0;left:0;right:0;z-index:50;transition:background .35s,border-color .35s,padding .35s;border-bottom:1px solid transparent;padding:22px 0;}
+  header.scrolled{background:rgba(7,5,13,.75);backdrop-filter:blur(14px);border-color:var(--line);padding:13px 0;}
+  nav{display:flex;align-items:center;justify-content:space-between;}
+  .brand{display:flex;align-items:center;gap:10px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:17px;}
+  .brand img{width:30px;height:30px;border-radius:8px;object-fit:cover;}
+  .navlinks{display:flex;gap:30px;font-size:14px;color:var(--muted);}
+  .navlinks a{position:relative;padding-bottom:4px;transition:color .2s;}
+  .navlinks a::after{content:"";position:absolute;left:0;bottom:0;height:1px;width:0;background:var(--cyan);transition:width .25s;}
+  .navlinks a:hover{color:var(--ink);}
+  .navlinks a.active{color:var(--ink);} .navlinks a.active::after{width:100%;}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:999px;font-weight:600;font-size:14px;cursor:pointer;border:1px solid transparent;transition:transform .25s,box-shadow .25s;will-change:transform;}
+  .btn-primary{background:linear-gradient(135deg,var(--amber),var(--magenta));color:#1a0a10;box-shadow:0 0 0 0 rgba(255,95,168,.4);}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 32px -8px rgba(255,95,168,.55);}
+  .btn-ghost{border-color:var(--line);color:var(--ink);}
+  .btn-ghost:hover{border-color:var(--cyan);color:var(--cyan);}
+  .btn-sm{padding:9px 16px;font-size:13px;}
+
+  .hero{position:relative;z-index:1;padding:170px 0 110px;text-align:center;}
+
+  /* ---- intro video section ---- */
+  .intro{position:relative;height:100vh;min-height:560px;overflow:hidden;padding:0;z-index:1;}
+  .intro video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
+  .intro .fade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,5,13,.15) 0%,rgba(7,5,13,.35) 60%,var(--bg) 98%);}
+  .intro .sound-toggle{position:absolute;right:24px;bottom:34px;z-index:2;width:44px;height:44px;border-radius:50%;
+    border:1px solid var(--line);background:rgba(7,5,13,.55);backdrop-filter:blur(6px);color:var(--ink);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;transition:border-color .25s,transform .25s;}
+  .intro .sound-toggle:hover{border-color:var(--cyan);transform:scale(1.08);}
+  .intro .scroll-cue{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);z-index:2;
+    display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);font-size:11px;letter-spacing:.12em;
+    animation:bob 2.2s ease-in-out infinite;}
+  .intro .scroll-cue svg{width:18px;height:18px;}
+  @keyframes bob{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(8px);}}
+  @media(max-width:640px){.intro{height:100svh;}}
+  .badge-row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:34px;}
+  .chip{border:1px solid var(--line);background:rgba(255,255,255,.03);border-radius:999px;padding:7px 14px;font-size:12.5px;color:var(--muted);}
+  .chip b{color:var(--cyan);font-weight:600;}
+  .logo-stage{position:relative;width:min(74vw,420px);margin:0 auto 30px;}
+  .logo-glow{position:absolute;inset:-25%;border-radius:50%;background:radial-gradient(circle,rgba(155,107,255,.4),rgba(62,230,242,.25) 45%,transparent 70%);filter:blur(20px);animation:pulse 3.6s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:.55;transform:scale(.94);}50%{opacity:1;transform:scale(1.05);}}
+  .logo-stage img{position:relative;animation:float 5.5s ease-in-out infinite;filter:drop-shadow(0 0 30px rgba(155,107,255,.3));border-radius:18px;}
+  @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+  .hero p.lead{max-width:520px;margin:0 auto 34px;color:var(--muted);font-size:16.5px;}
+  .hero-cta{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;}
+  .countdown{display:flex;justify-content:center;gap:14px;margin-top:52px;flex-wrap:wrap;}
+  .countdown div{min-width:74px;padding:14px 6px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.02);}
+  .countdown span{display:block;font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;color:var(--cyan);}
+  .countdown small{color:var(--muted);font-size:11px;letter-spacing:.08em;}
+
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease;}
+  .reveal.in{opacity:1;transform:none;}
+  section{position:relative;z-index:1;padding:96px 0;}
+  .kicker{color:var(--cyan);font-size:12.5px;font-weight:600;letter-spacing:.14em;margin-bottom:12px;}
+  .section-head{max-width:600px;margin-bottom:56px;}
+  .section-head h2{font-size:clamp(26px,3.6vw,38px);}
+  .section-head p{color:var(--muted);margin-top:14px;font-size:15.5px;}
+
+  .about-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:60px;align-items:center;}
+  .about-grid p{color:var(--muted);margin-bottom:16px;font-size:15.5px;}
+  .about-visual{position:relative;border:1px solid var(--line);border-radius:20px;padding:30px;background:linear-gradient(160deg,var(--panel),transparent);}
+  .about-visual .row{display:flex;justify-content:space-between;padding:14px 0;border-bottom:1px dashed var(--line);}
+  .about-visual .row:last-child{border-bottom:0;}
+  .about-visual .row span:first-child{color:var(--muted);font-size:13.5px;}
+  .about-visual .row span:last-child{font-family:'Space Grotesk',sans-serif;font-weight:600;}
+
+  .journey{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;position:relative;}
+  .journey::before{content:"";position:absolute;top:34px;left:6%;right:6%;height:1px;background:linear-gradient(90deg,transparent,var(--line) 15%,var(--line) 85%,transparent);}
+  .stage{position:relative;padding:0 4px;}
+  .stage .num{width:66px;height:66px;border-radius:50%;border:1px solid var(--line);background:var(--bg-soft);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:14px;margin-bottom:22px;position:relative;z-index:1;transition:box-shadow .3s,border-color .3s;}
+  .stage[data-c="cyan"] .num{color:var(--cyan);} .stage[data-c="violet"] .num{color:var(--violet);}
+  .stage[data-c="magenta"] .num{color:var(--magenta);} .stage[data-c="amber"] .num{color:var(--amber);}
+  .stage:hover .num{box-shadow:0 0 24px currentColor;border-color:currentColor;}
+  .stage h3{font-size:18px;margin-bottom:8px;} .stage p{color:var(--muted);font-size:14px;}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:18px;overflow:hidden;}
+  .stat{background:var(--bg-soft);padding:32px 20px;text-align:center;}
+  .stat b{display:block;font-family:'Space Grotesk',sans-serif;font-size:30px;background:linear-gradient(135deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .stat span{color:var(--muted);font-size:13px;}
+
+  .tl{position:relative;max-width:640px;margin:0 auto;}
+  .tl::before{content:"";position:absolute;left:19px;top:6px;bottom:6px;width:2px;background:var(--line);}
+  .tl-item{position:relative;padding-left:56px;margin-bottom:34px;}
+  .tl-item:last-child{margin-bottom:0;}
+  .tl-item::before{content:"";position:absolute;left:12px;top:4px;width:16px;height:16px;border-radius:50%;background:var(--bg);border:2px solid var(--violet);box-shadow:0 0 12px rgba(155,107,255,.5);}
+  .tl-item .date{color:var(--cyan);font-family:'IBM Plex Mono',monospace;font-size:12.5px;margin-bottom:4px;}
+  .tl-item h3{font-size:16.5px;margin-bottom:4px;} .tl-item p{color:var(--muted);font-size:14px;}
+
+  .faq{max-width:700px;margin:0 auto;}
+  details{border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:12px;background:rgba(255,255,255,.015);}
+  summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;font-weight:500;font-size:15px;}
+  summary::-webkit-details-marker{display:none;}
+  summary::after{content:"+";font-size:20px;color:var(--cyan);transition:transform .25s;}
+  details[open] summary::after{transform:rotate(45deg);}
+  details p{color:var(--muted);margin-top:12px;font-size:14.5px;}
+
+  .cta-band{border:1px solid var(--line);border-radius:22px;padding:64px 40px;text-align:center;background:radial-gradient(circle at 50% 0%,rgba(255,95,168,.14),transparent 60%),var(--panel);}
+  .cta-band h2{font-size:clamp(24px,3.4vw,34px);margin-bottom:14px;}
+  .cta-band p{color:var(--muted);margin-bottom:30px;}
+
+  footer{border-top:1px solid var(--line);padding:52px 0 30px;position:relative;z-index:1;}
+  .foot-grid{display:flex;justify-content:space-between;flex-wrap:wrap;gap:30px;margin-bottom:34px;}
+  .foot-col h4{font-size:13px;color:var(--muted);letter-spacing:.06em;margin-bottom:14px;}
+  .foot-col a,.foot-col p{display:block;color:var(--ink);font-size:14px;margin-bottom:8px;}
+  .foot-bottom{color:var(--muted);font-size:12.5px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;border-top:1px solid var(--line);padding-top:22px;}
+
+  .progress{position:fixed;top:0;left:0;height:3px;width:0%;z-index:80;background:linear-gradient(90deg,var(--cyan),var(--violet),var(--magenta));box-shadow:0 0 12px rgba(155,107,255,.6);}
+  .cursor-dot,.cursor-ring{position:fixed;top:0;left:0;border-radius:50%;pointer-events:none;z-index:90;transform:translate(-50%,-50%);}
+  .cursor-dot{width:7px;height:7px;background:var(--cyan);box-shadow:0 0 8px 2px rgba(62,230,242,.7);}
+  .cursor-ring{width:34px;height:34px;border:1px solid rgba(155,107,255,.55);transition:width .25s,height .25s,border-color .25s,background .25s;}
+  .cursor-ring.big{width:58px;height:58px;background:rgba(155,107,255,.1);border-color:var(--violet);}
+  body.has-cursor,body.has-cursor a,body.has-cursor button,body.has-cursor summary{cursor:none;}
+  @media(hover:none),(pointer:coarse){.cursor-dot,.cursor-ring,.progress{display:none;}}
+
+  .side-nav{position:fixed;right:22px;top:50%;transform:translateY(-50%);z-index:55;display:flex;flex-direction:column;gap:16px;}
+  .side-nav button{width:9px;height:9px;border-radius:50%;border:1px solid var(--line);background:transparent;padding:0;cursor:pointer;position:relative;transition:background .25s,border-color .25s,transform .25s;}
+  .side-nav button::after{content:attr(data-label);position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--muted);white-space:nowrap;opacity:0;transition:opacity .2s;background:rgba(7,5,13,.85);border:1px solid var(--line);padding:4px 9px;border-radius:6px;}
+  .side-nav button:hover::after{opacity:1;}
+  .side-nav button.active{background:var(--violet);border-color:var(--violet);transform:scale(1.3);box-shadow:0 0 10px rgba(155,107,255,.6);}
+  @media(max-width:880px){.side-nav{display:none;}}
+
+  @media(max-width:880px){
+    .navlinks{display:none;} .about-grid{grid-template-columns:1fr;}
+    .journey{grid-template-columns:repeat(2,1fr);row-gap:36px;} .journey::before{display:none;}
+    .stats{grid-template-columns:repeat(2,1fr);}
+  }
+  @media(max-width:520px){
+    .hero{padding:150px 0 80px;} .countdown div{min-width:62px;padding:10px 4px;}
+    .stats{grid-template-columns:1fr 1fr;} .cta-band{padding:44px 22px;}
+  }
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js" crossorigin></script>
+
+<script type="text/babel" data-type="module">
+const {useState, useEffect, useRef} = React;
+
+/* ====== EDIT THESE VALUES BEFORE DEPLOYING ====== */
+const CONFIG = {
+  registrationFormUrl: "https://docs.google.com/forms/d/e/1FAIpQLSc0ZMLrS-nh4fjTwqAL6h6wVqwx6gCeBfIiOUt_RNfoxa9ykg/viewform?usp=header",
+  eventDateISO: "2026-10-30T09:00:00",
+  dateLabel: "30 – 31 Oct 2026",
+  venue: "VVCE Campus, Gokulam 3rd Stage, Mysuru",
+  teamSize: "2 – 4 Members",
+  duration: "24 Hours",
+  prizePool: "₹1,25,000",
+  timeline: [
+    { date: "28 Sep 2026", title: "Registrations Open", desc: "Form your team and submit your details." },
+    { date: "21 Oct 2026", title: "Registrations Close", desc: "Last date to register your team." },
+    { date: "23 Oct 2026", title: "Shortlist Announced", desc: "Selected teams are notified via email." },
+    { date: "30 – 31 Oct 2026", title: "Hackathon Day", desc: "Teams build and present on campus." }
+  ],
+  faq: [
+    ["What is Tech-ಶೋಧ?","Tech-ಶೋಧ is a student-run hackathon hosted at VVCE, Mysuru, where teams build working solutions to real problems within a fixed time window."],
+    ["Who can participate?","Students from any branch and year, across colleges, are welcome to register and take part."],
+    ["What team size is allowed?","Teams of 2 to 4 members. You can register as a full team or find teammates after registering."],
+    ["Is there a registration fee?","Fee details, if any, will be shared on the registration form and updated here closer to the date."],
+    ["What should I bring?","Your laptop, chargers, student ID, and a team ready to build."]
+  ],
+  journey: [
+    ["01","Explore","Dig into real problem statements before you write a single line of code.","cyan"],
+    ["02","Build","Turn your concept into a working prototype with your team and the tools on hand.","violet"],
+    ["03","Solve","Stress-test the rough edges and get your build to actually work under pressure.","magenta"],
+    ["04","Evolve","Present your solution, take the feedback, and carry the idea beyond the classroom.","amber"]
+  ]
+};
+/* ================================================= */
+
+function useReveal(ref, delay=0){
+  useEffect(()=>{
+    const el = ref.current; if(!el) return;
+    el.style.transitionDelay = delay+'s';
+    const io = new IntersectionObserver(([e])=>{ if(e.isIntersecting){ el.classList.add('in'); io.unobserve(el);} },{threshold:.15});
+    io.observe(el);
+    return ()=>io.disconnect();
+  },[]);
+}
+function Reveal({as:Tag='div', delay=0, className='', children, ...rest}){
+  const ref = useRef(null);
+  useReveal(ref, delay);
+  return <Tag ref={ref} className={"reveal "+className} {...rest}>{children}</Tag>;
+}
+
+function BackgroundArt(){
+  const wrapRef = useRef(null);
+  const canvasRef = useRef(null);
+
+  // slow parallax drift of the color blobs on mouse move
+  useEffect(()=>{
+    if(window.matchMedia('(hover:none),(pointer:coarse)').matches) return;
+    const onMove = e=>{
+      const x=(e.clientX/innerWidth-.5)*24, y=(e.clientY/innerHeight-.5)*24;
+      if(wrapRef.current) wrapRef.current.style.transform = `translate(${x}px,${y}px)`;
+    };
+    document.addEventListener('mousemove', onMove);
+    return ()=>document.removeEventListener('mousemove', onMove);
+  },[]);
+
+  // procedural "video" background: a live, moving particle-network animation
+  useEffect(()=>{
+    const canvas = canvasRef.current; if(!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const colors = ['62,230,242', '155,107,255', '255,95,168'];
+    let w,h,dpr,particles,raf,mouse={x:-9999,y:-9999};
+
+    function sized(){
+      dpr = Math.min(window.devicePixelRatio||1, 2);
+      w = canvas.clientWidth; h = canvas.clientHeight;
+      canvas.width = w*dpr; canvas.height = h*dpr;
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+    }
+    function makeParticles(){
+      const count = Math.max(28, Math.min(80, Math.round((w*h)/22000)));
+      particles = Array.from({length:count}, ()=>({
+        x: Math.random()*w, y: Math.random()*h,
+        vx: (Math.random()-.5)*.25, vy: (Math.random()-.5)*.25,
+        r: 1.2 + Math.random()*1.6,
+        c: colors[Math.floor(Math.random()*colors.length)]
+      }));
+    }
+    function step(){
+      ctx.clearRect(0,0,w,h);
+      for(const p of particles){
+        p.x += p.vx; p.y += p.vy;
+        if(p.x < 0) p.x = w; if(p.x > w) p.x = 0;
+        if(p.y < 0) p.y = h; if(p.y > h) p.y = 0;
+        const dx = p.x-mouse.x, dy = p.y-mouse.y, d2 = dx*dx+dy*dy;
+        if(d2 < 14400){ const f = (14400-d2)/14400*.6; p.x += dx*f*.02; p.y += dy*f*.02; }
+      }
+      for(let i=0;i<particles.length;i++){
+        for(let j=i+1;j<particles.length;j++){
+          const a=particles[i], b=particles[j];
+          const dx=a.x-b.x, dy=a.y-b.y, dist=Math.sqrt(dx*dx+dy*dy);
+          if(dist < 130){
+            ctx.strokeStyle = `rgba(${a.c},${(1-dist/130)*.22})`;
+            ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+          }
+        }
+      }
+      for(const p of particles){
+        ctx.beginPath(); ctx.fillStyle = `rgba(${p.c},.85)`;
+        ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+      }
+      if(!reduced) raf = requestAnimationFrame(step);
+    }
+    function onMouseMove(e){ mouse.x = e.clientX; mouse.y = e.clientY; }
+    function onLeave(){ mouse.x = -9999; mouse.y = -9999; }
+
+    sized(); makeParticles(); step();
+    window.addEventListener('resize', ()=>{ sized(); makeParticles(); });
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseleave', onLeave);
+    return ()=>{ cancelAnimationFrame(raf);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseleave', onLeave); };
+  },[]);
+
+  return (
+    <div className="bg-layer">
+      <div ref={wrapRef}>
+        <div className="blob b1"></div><div className="blob b2"></div><div className="blob b3"></div>
+      </div>
+      <canvas ref={canvasRef} className="bg-canvas"></canvas>
+      <div className="bg-vignette"></div>
+    </div>
+  );
+}
+
+function CustomCursor(){
+  const dot = useRef(null), ring = useRef(null);
+  useEffect(()=>{
+    if(window.matchMedia('(hover:none),(pointer:coarse)').matches ||
+       window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    document.body.classList.add('has-cursor');
+    let mx=innerWidth/2,my=innerHeight/2, rx=mx, ry=my, raf;
+    const onMove = e=>{ mx=e.clientX; my=e.clientY;
+      if(dot.current){ dot.current.style.left=mx+'px'; dot.current.style.top=my+'px'; } };
+    window.addEventListener('mousemove', onMove);
+    const loop = ()=>{ rx+=(mx-rx)*.16; ry+=(my-ry)*.16;
+      if(ring.current){ ring.current.style.left=rx+'px'; ring.current.style.top=ry+'px'; }
+      raf = requestAnimationFrame(loop); };
+    loop();
+    const onEnter = ()=>ring.current && ring.current.classList.add('big');
+    const onLeave = ()=>ring.current && ring.current.classList.remove('big');
+    const targets = document.querySelectorAll('a,button,summary,.stage,.about-visual');
+    targets.forEach(el=>{ el.addEventListener('mouseenter',onEnter); el.addEventListener('mouseleave',onLeave); });
+    return ()=>{ cancelAnimationFrame(raf); window.removeEventListener('mousemove',onMove);
+      targets.forEach(el=>{ el.removeEventListener('mouseenter',onEnter); el.removeEventListener('mouseleave',onLeave); }); };
+  },[]);
+  return <React.Fragment><div className="cursor-ring" ref={ring}></div><div className="cursor-dot" ref={dot}></div></React.Fragment>;
+}
+
+function ProgressBar(){
+  const [w,setW] = useState(0);
+  useEffect(()=>{
+    const onScroll = ()=>{ const h=document.documentElement;
+      setW(h.scrollTop/(h.scrollHeight-h.clientHeight)*100); };
+    window.addEventListener('scroll', onScroll, {passive:true}); onScroll();
+    return ()=>window.removeEventListener('scroll', onScroll);
+  },[]);
+  return <div className="progress" style={{width:w+'%'}}></div>;
+}
+
+function useMagnetic(ref){
+  useEffect(()=>{
+    const el = ref.current; if(!el) return;
+    if(window.matchMedia('(hover:none),(pointer:coarse)').matches) return;
+    const onMove = e=>{ const r=el.getBoundingClientRect();
+      const x=e.clientX-r.left-r.width/2, y=e.clientY-r.top-r.height/2;
+      el.style.transform = `translate(${x*.18}px, ${y*.3}px)`; };
+    const onLeave = ()=> el.style.transform = '';
+    el.addEventListener('mousemove', onMove); el.addEventListener('mouseleave', onLeave);
+    return ()=>{ el.removeEventListener('mousemove', onMove); el.removeEventListener('mouseleave', onLeave); };
+  },[]);
+}
+function MagBtn({className, children, ...rest}){
+  const ref = useRef(null); useMagnetic(ref);
+  return <a ref={ref} className={className} target="_blank" rel="noopener" {...rest}>{children}</a>;
+}
+
+function useSectionSpy(ids){
+  const [active, setActive] = useState(ids[0]);
+  useEffect(()=>{
+    const els = ids.map(id=>document.getElementById(id)).filter(Boolean);
+    const io = new IntersectionObserver(entries=>{
+      entries.forEach(e=>{ if(e.isIntersecting) setActive(e.target.id); });
+    },{rootMargin:'-45% 0px -45% 0px'});
+    els.forEach(el=>io.observe(el));
+    return ()=>io.disconnect();
+  },[]);
+  return active;
+}
+
+function SideNav({active}){
+  const items = [["intro","Intro"],["hero","Home"],["about","About"],["journey","Journey"],["timeline","Timeline"],["faq","FAQ"],["register","Register"]];
+  return (
+    <nav className="side-nav">
+      {items.map(([id,label])=>(
+        <button key={id} data-label={label} className={active===id?'active':''}
+          onClick={()=>document.getElementById(id).scrollIntoView({behavior:'smooth'})}></button>
+      ))}
+    </nav>
+  );
+}
+
+function Header({active}){
+  const [scrolled,setScrolled] = useState(false);
+  useEffect(()=>{
+    const onScroll = ()=>setScrolled(window.scrollY>10);
+    window.addEventListener('scroll', onScroll, {passive:true});
+    return ()=>window.removeEventListener('scroll', onScroll);
+  },[]);
+  const links = [["about","About"],["journey","Journey"],["timeline","Timeline"],["faq","FAQ"]];
+  return (
+    <header className={scrolled?'scrolled':''}>
+      <div className="wrap"><nav>
+        <a href="#intro" className="brand"><img src="assets/logo.jpg" alt="Tech-Shodha"/> Tech-ಶೋಧ</a>
+        <div className="navlinks">
+          {links.map(([id,label])=><a key={id} href={"#"+id} className={active===id?'active':''}>{label}</a>)}
+        </div>
+      </nav></div>
+    </header>
+  );
+}
+
+function Countdown(){
+  const [t,setT] = useState({d:'--',h:'--',m:'--',s:'--'});
+  useEffect(()=>{
+    const tick = ()=>{
+      const diff = new Date(CONFIG.eventDateISO) - new Date();
+      if(diff<=0){ setT({d:'00',h:'00',m:'00',s:'00'}); return; }
+      const pad = n=>String(n).padStart(2,'0');
+      setT({ d:pad(Math.floor(diff/86400000)), h:pad(Math.floor(diff/3600000)%24),
+             m:pad(Math.floor(diff/60000)%60), s:pad(Math.floor(diff/1000)%60) });
+    };
+    tick(); const id = setInterval(tick,1000); return ()=>clearInterval(id);
+  },[]);
+  return (
+    <Reveal className="countdown">
+      {[['DAYS',t.d],['HOURS',t.h],['MINS',t.m],['SECS',t.s]].map(([label,val])=>(
+        <div key={label}><span>{val}</span><small>{label}</small></div>
+      ))}
+    </Reveal>
+  );
+}
+
+function IntroVideo(){
+  const videoRef = useRef(null);
+  const [muted, setMuted] = useState(true);
+  const toggleSound = ()=>{
+    const v = videoRef.current; if(!v) return;
+    v.muted = !v.muted; setMuted(v.muted);
+  };
+  return (
+    <section className="intro" id="intro">
+      <video ref={videoRef} autoPlay muted loop playsInline poster="assets/intro-poster.jpg">
+        <source src="assets/intro.mp4" type="video/mp4"/>
+      </video>
+      <div className="fade"></div>
+      <button className="sound-toggle" onClick={toggleSound} aria-label={muted?'Unmute video':'Mute video'}>
+        {muted ? '🔇' : '🔊'}
+      </button>
+      <a className="scroll-cue" href="#hero">
+        <span>SCROLL</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 4v16m0 0l-6-6m6 6l6-6"/></svg>
+      </a>
+    </section>
+  );
+}
+
+function Hero(){
+  return (
+    <section className="hero" id="hero"><div className="wrap">
+      <Reveal className="badge-row">
+        <span className="chip">VVCE, MYSURU</span>
+        <span className="chip">Ideas Beyond Classrooms</span>
+        <span className="chip">Dates <b>{CONFIG.dateLabel}</b></span>
+      </Reveal>
+      <Reveal className="logo-stage" delay={.1}>
+        <div className="logo-glow"></div>
+        <img src="assets/logo.jpg" alt="Tech-ಶೋಧ — A Hackathon for a Brighter Tomorrow"/>
+      </Reveal>
+      <Reveal as="p" className="lead" delay={.2}>A hackathon where curiosity turns into code. Explore real problems, build working solutions, solve under pressure, and evolve your idea beyond the classroom.</Reveal>
+      <Reveal className="hero-cta" delay={.3}>
+        <a className="btn btn-ghost" href="#about">Explore Details</a>
+      </Reveal>
+      <Countdown/>
+    </div></section>
+  );
+}
+
+function About(){
+  const rows = [["Format","In-person"],["Team Size",CONFIG.teamSize],["Duration",CONFIG.duration],["Venue",CONFIG.venue],["Prize Pool",CONFIG.prizePool]];
+  return (
+    <section id="about"><div className="wrap about-grid">
+      <Reveal>
+        <p className="kicker">ABOUT THE HACKATHON</p>
+        <h2>Built by students, for the builders of tomorrow.</h2>
+        <p>Tech-ಶೋಧ is more than a competition — it's a space where students step outside the syllabus and build something that matters. Over one intense stretch of time, teams take a real problem from a rough idea to a working prototype.</p>
+        <p>Whether you're a first-time hacker or a seasoned builder, this is your platform to explore emerging tech, ship fast, and walk away with something you actually made.</p>
+        <a className="btn btn-ghost btn-sm" href="#timeline">See the schedule</a>
+      </Reveal>
+      <Reveal className="about-visual" delay={.15}>
+        {rows.map(([k,v])=><div className="row" key={k}><span>{k}</span><span>{v}</span></div>)}
+      </Reveal>
+    </div></section>
+  );
+}
+
+function Journey(){
+  return (
+    <section id="journey"><div className="wrap">
+      <Reveal className="section-head">
+        <p className="kicker">THE JOURNEY</p>
+        <h2>Four stages. One path to the finish line.</h2>
+        <p>Every team moves through the same journey — how far you push each stage is what sets you apart.</p>
+      </Reveal>
+      <div className="journey">
+        {CONFIG.journey.map(([num,title,desc,color],i)=>(
+          <Reveal as="div" key={num} className="stage" data-c={color} delay={i*0.08}>
+            <div className="num">{num}</div><h3>{title}</h3><p>{desc}</p>
+          </Reveal>
+        ))}
+      </div>
+    </div></section>
+  );
+}
+
+function useCountUp(target, active){
+  const [val,setVal] = useState(0);
+  useEffect(()=>{
+    if(!active) return;
+    const t0 = performance.now(), dur=1200;
+    const step = t=>{ const p=Math.min((t-t0)/dur,1);
+      setVal(Math.floor(target*(1-Math.pow(1-p,3)))); if(p<1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  },[active]);
+  return val;
+}
+function Stats(){
+  const ref = useRef(null); const [inView,setInView] = useState(false);
+  useEffect(()=>{
+    const io = new IntersectionObserver(([e])=>{ if(e.isIntersecting){ setInView(true); io.disconnect(); } },{threshold:.5});
+    if(ref.current) io.observe(ref.current); return ()=>io.disconnect();
+  },[]);
+  const hours = useCountUp(parseInt(CONFIG.duration)||24, inView);
+  return (
+    <section id="stats"><div className="wrap" ref={ref}>
+      <Reveal className="stats">
+        <div className="stat"><b>{hours}</b><span>Hours of Building</span></div>
+        <div className="stat"><b>{CONFIG.teamSize.replace(/\D+/g,'-').replace(/^-|-$/g,'')}</b><span>Members per Team</span></div>
+        <div className="stat"><b>{CONFIG.prizePool}</b><span>Prize Pool</span></div>
+        <div className="stat"><b>1</b><span>Campus, VVCE Mysuru</span></div>
+      </Reveal>
+    </div></section>
+  );
+}
+
+function Timeline(){
+  return (
+    <section id="timeline"><div className="wrap">
+      <Reveal className="section-head">
+        <p className="kicker">EVENT FLOW</p><h2>From sign-up to the final demo.</h2>
+      </Reveal>
+      <div className="tl">
+        {CONFIG.timeline.map((item,i)=>(
+          <Reveal as="div" key={item.title} className="tl-item" delay={i*0.08}>
+            <div className="date mono">{item.date}</div><h3>{item.title}</h3><p>{item.desc}</p>
+          </Reveal>
+        ))}
+      </div>
+    </div></section>
+  );
+}
+
+function FAQ(){
+  return (
+    <section id="faq"><div className="wrap">
+      <Reveal className="section-head">
+        <p className="kicker">GOT QUESTIONS?</p><h2>Frequently asked questions</h2>
+      </Reveal>
+      <div className="faq">
+        {CONFIG.faq.map(([q,a],i)=>(
+          <Reveal as="details" key={q} delay={i*0.06} open={i===0?true:undefined}>
+            <summary>{q}</summary><p>{a}</p>
+          </Reveal>
+        ))}
+      </div>
+    </div></section>
+  );
+}
+
+function CTA(){
+  return (
+    <section id="register"><div className="wrap">
+      <Reveal className="cta-band">
+        <h2>Ready to build something that matters?</h2>
+        <p>Seats are limited — register your team before the window closes.</p>
+        <MagBtn className="btn btn-primary" href={CONFIG.registrationFormUrl}>Register Your Team →</MagBtn>
+      </Reveal>
+    </div></section>
+  );
+}
+
+function Footer(){
+  return (
+    <footer><div className="wrap">
+      <div className="foot-grid">
+        <div className="foot-col"><h4>TECH-ಶೋಧ</h4>
+          <p style={{color:'var(--muted)',maxWidth:220}}>A hackathon for a brighter tomorrow, hosted by VVCE, Mysuru.</p></div>
+        <div className="foot-col"><h4>CONTACT</h4>
+          <a href="mailto:techshodha.vvce@example.com">techshodha.vvce@example.com</a>
+          <p style={{color:'var(--muted)'}}>VVCE, Gokulam 3rd Stage, Mysuru</p></div>
+        <div className="foot-col"><h4>QUICK LINKS</h4>
+          <a href="#about">About</a><a href="#journey">Journey</a><a href="#timeline">Timeline</a><a href="#faq">FAQ</a></div>
+      </div>
+      <div className="foot-bottom">
+        <span>© {new Date().getFullYear()} Tech-ಶೋಧ, VVCE Mysuru. All rights reserved.</span>
+        <span>Explore · Build · Solve · Evolve</span>
+      </div>
+    </div></footer>
+  );
+}
+
+function App(){
+  const active = useSectionSpy(['intro','hero','about','journey','timeline','faq','register']);
+  return (
+    <React.Fragment>
+      <ProgressBar/><CustomCursor/><BackgroundArt/>
+      <Header active={active}/>
+      <SideNav active={active}/>
+      <main><IntroVideo/><Hero/><About/><Journey/><Stats/><Timeline/><FAQ/><CTA/></main>
+      <Footer/>
+    </React.Fragment>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
