@@ -397,7 +397,7 @@ function Header({active}){
   return (
     <header className={scrolled?'scrolled':''}>
       <div className="wrap"><nav>
-        <a href="#intro" className="brand"><img src="assets/logo.jpg" alt="Tech-Shodha"/> Tech-ಶೋಧ</a>
+        <a href="#intro" className="brand"><img src="assets/Image.jpg" alt="Tech-Shodha"/> Tech-ಶೋಧ</a>
         <div className="navlinks">
           {links.map(([id,label])=><a key={id} href={"#"+id} className={active===id?'active':''}>{label}</a>)}
         </div>
@@ -461,7 +461,7 @@ function Hero(){
       </Reveal>
       <Reveal className="logo-stage" delay={.1}>
         <div className="logo-glow"></div>
-        <img src="assets/logo.jpg" alt="Tech-ಶೋಧ — A Hackathon for a Brighter Tomorrow"/>
+        <img src="assets/Image.jpg" alt="Tech-ಶೋಧ — A Hackathon for a Brighter Tomorrow"/>
       </Reveal>
       <Reveal as="p" className="lead" delay={.2}>A hackathon where curiosity turns into code. Explore real problems, build working solutions, solve under pressure, and evolve your idea beyond the classroom.</Reveal>
       <Reveal className="hero-cta" delay={.3}>
