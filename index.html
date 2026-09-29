@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Tech-ಶೋಧ | A Hackathon for a Brighter Tomorrow</title>
 <meta name="description" content="Tech-ಶೋಧ — a hackathon by VVCE, Mysuru. Explore. Build. Solve. Evolve.">
 <link rel="icon" href="assets/Image.jpg">
@@ -17,8 +17,8 @@
     --ink:#f4f2fb; --muted:#a2a2c0;
   }
   *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+  html{scroll-behavior:smooth;overflow-x:hidden;width:100%;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;width:100%;}
   h1,h2,h3{font-family:'Space Grotesk',sans-serif;margin:0;letter-spacing:-.01em;}
   p{margin:0;} a{color:inherit;text-decoration:none;}
   .mono{font-family:'IBM Plex Mono',monospace;}
@@ -54,20 +54,34 @@
 
   .hero{position:relative;z-index:1;padding:170px 0 110px;text-align:center;}
 
-  /* ---- intro video section ---- */
-  .intro{position:relative;height:100vh;min-height:560px;overflow:hidden;padding:0;z-index:1;}
-  .intro video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
+  /* ---- intro video section (responsive: uses dynamic viewport height so mobile
+     browser chrome never pushes the video out of the visible screen) ---- */
+  .intro{position:relative;width:100%;overflow:hidden;padding:0;z-index:1;
+    height:100vh;height:100svh;height:100dvh;min-height:380px;max-height:900px;}
+  .intro video{position:absolute;top:0;left:0;width:100%;height:100%;max-width:100%;
+    object-fit:cover;object-position:center center;display:block;background:#000;}
   .intro .fade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,5,13,.15) 0%,rgba(7,5,13,.35) 60%,var(--bg) 98%);}
-  .intro .sound-toggle{position:absolute;right:24px;bottom:34px;z-index:2;width:44px;height:44px;border-radius:50%;
+  .intro .sound-toggle{position:absolute;right:18px;z-index:2;width:44px;height:44px;border-radius:50%;
+    bottom:calc(env(safe-area-inset-bottom,0px) + 24px);
     border:1px solid var(--line);background:rgba(7,5,13,.55);backdrop-filter:blur(6px);color:var(--ink);
     display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;transition:border-color .25s,transform .25s;}
   .intro .sound-toggle:hover{border-color:var(--cyan);transform:scale(1.08);}
-  .intro .scroll-cue{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);z-index:2;
+  .intro .scroll-cue{position:absolute;left:50%;transform:translateX(-50%);z-index:2;
+    bottom:calc(env(safe-area-inset-bottom,0px) + 18px);
     display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);font-size:11px;letter-spacing:.12em;
     animation:bob 2.2s ease-in-out infinite;}
   .intro .scroll-cue svg{width:18px;height:18px;}
   @keyframes bob{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(8px);}}
-  @media(max-width:640px){.intro{height:100svh;}}
+  @media(max-width:640px){
+    .intro{min-height:420px;max-height:none;}
+    .intro .sound-toggle{width:38px;height:38px;font-size:15px;right:14px;}
+    .intro .scroll-cue{font-size:10px;}
+  }
+  @media(orientation:landscape) and (max-height:520px){
+    .intro{height:100vh;height:100svh;height:100dvh;min-height:320px;}
+    .intro .sound-toggle,.intro .scroll-cue{bottom:calc(env(safe-area-inset-bottom,0px) + 10px);}
+  }
+
   .badge-row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:34px;}
   .chip{border:1px solid var(--line);background:rgba(255,255,255,.03);border-radius:999px;padding:7px 14px;font-size:12.5px;color:var(--muted);}
   .chip b{color:var(--cyan);font-weight:600;}
@@ -226,7 +240,6 @@ function BackgroundArt(){
   const wrapRef = useRef(null);
   const canvasRef = useRef(null);
 
-  // slow parallax drift of the color blobs on mouse move
   useEffect(()=>{
     if(window.matchMedia('(hover:none),(pointer:coarse)').matches) return;
     const onMove = e=>{
@@ -237,7 +250,6 @@ function BackgroundArt(){
     return ()=>document.removeEventListener('mousemove', onMove);
   },[]);
 
-  // procedural "video" background: a live, moving particle-network animation
   useEffect(()=>{
     const canvas = canvasRef.current; if(!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -287,338 +299,4 @@ function BackgroundArt(){
       if(!reduced) raf = requestAnimationFrame(step);
     }
     function onMouseMove(e){ mouse.x = e.clientX; mouse.y = e.clientY; }
-    function onLeave(){ mouse.x = -9999; mouse.y = -9999; }
-
-    sized(); makeParticles(); step();
-    window.addEventListener('resize', ()=>{ sized(); makeParticles(); });
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseleave', onLeave);
-    return ()=>{ cancelAnimationFrame(raf);
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseleave', onLeave); };
-  },[]);
-
-  return (
-    <div className="bg-layer">
-      <div ref={wrapRef}>
-        <div className="blob b1"></div><div className="blob b2"></div><div className="blob b3"></div>
-      </div>
-      <canvas ref={canvasRef} className="bg-canvas"></canvas>
-      <div className="bg-vignette"></div>
-    </div>
-  );
-}
-
-function CustomCursor(){
-  const dot = useRef(null), ring = useRef(null);
-  useEffect(()=>{
-    if(window.matchMedia('(hover:none),(pointer:coarse)').matches ||
-       window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    document.body.classList.add('has-cursor');
-    let mx=innerWidth/2,my=innerHeight/2, rx=mx, ry=my, raf;
-    const onMove = e=>{ mx=e.clientX; my=e.clientY;
-      if(dot.current){ dot.current.style.left=mx+'px'; dot.current.style.top=my+'px'; } };
-    window.addEventListener('mousemove', onMove);
-    const loop = ()=>{ rx+=(mx-rx)*.16; ry+=(my-ry)*.16;
-      if(ring.current){ ring.current.style.left=rx+'px'; ring.current.style.top=ry+'px'; }
-      raf = requestAnimationFrame(loop); };
-    loop();
-    const onEnter = ()=>ring.current && ring.current.classList.add('big');
-    const onLeave = ()=>ring.current && ring.current.classList.remove('big');
-    const targets = document.querySelectorAll('a,button,summary,.stage,.about-visual');
-    targets.forEach(el=>{ el.addEventListener('mouseenter',onEnter); el.addEventListener('mouseleave',onLeave); });
-    return ()=>{ cancelAnimationFrame(raf); window.removeEventListener('mousemove',onMove);
-      targets.forEach(el=>{ el.removeEventListener('mouseenter',onEnter); el.removeEventListener('mouseleave',onLeave); }); };
-  },[]);
-  return <React.Fragment><div className="cursor-ring" ref={ring}></div><div className="cursor-dot" ref={dot}></div></React.Fragment>;
-}
-
-function ProgressBar(){
-  const [w,setW] = useState(0);
-  useEffect(()=>{
-    const onScroll = ()=>{ const h=document.documentElement;
-      setW(h.scrollTop/(h.scrollHeight-h.clientHeight)*100); };
-    window.addEventListener('scroll', onScroll, {passive:true}); onScroll();
-    return ()=>window.removeEventListener('scroll', onScroll);
-  },[]);
-  return <div className="progress" style={{width:w+'%'}}></div>;
-}
-
-function useMagnetic(ref){
-  useEffect(()=>{
-    const el = ref.current; if(!el) return;
-    if(window.matchMedia('(hover:none),(pointer:coarse)').matches) return;
-    const onMove = e=>{ const r=el.getBoundingClientRect();
-      const x=e.clientX-r.left-r.width/2, y=e.clientY-r.top-r.height/2;
-      el.style.transform = `translate(${x*.18}px, ${y*.3}px)`; };
-    const onLeave = ()=> el.style.transform = '';
-    el.addEventListener('mousemove', onMove); el.addEventListener('mouseleave', onLeave);
-    return ()=>{ el.removeEventListener('mousemove', onMove); el.removeEventListener('mouseleave', onLeave); };
-  },[]);
-}
-function MagBtn({className, children, ...rest}){
-  const ref = useRef(null); useMagnetic(ref);
-  return <a ref={ref} className={className} target="_blank" rel="noopener" {...rest}>{children}</a>;
-}
-
-function useSectionSpy(ids){
-  const [active, setActive] = useState(ids[0]);
-  useEffect(()=>{
-    const els = ids.map(id=>document.getElementById(id)).filter(Boolean);
-    const io = new IntersectionObserver(entries=>{
-      entries.forEach(e=>{ if(e.isIntersecting) setActive(e.target.id); });
-    },{rootMargin:'-45% 0px -45% 0px'});
-    els.forEach(el=>io.observe(el));
-    return ()=>io.disconnect();
-  },[]);
-  return active;
-}
-
-function SideNav({active}){
-  const items = [["intro","Intro"],["hero","Home"],["about","About"],["journey","Journey"],["timeline","Timeline"],["faq","FAQ"],["register","Register"]];
-  return (
-    <nav className="side-nav">
-      {items.map(([id,label])=>(
-        <button key={id} data-label={label} className={active===id?'active':''}
-          onClick={()=>document.getElementById(id).scrollIntoView({behavior:'smooth'})}></button>
-      ))}
-    </nav>
-  );
-}
-
-function Header({active}){
-  const [scrolled,setScrolled] = useState(false);
-  useEffect(()=>{
-    const onScroll = ()=>setScrolled(window.scrollY>10);
-    window.addEventListener('scroll', onScroll, {passive:true});
-    return ()=>window.removeEventListener('scroll', onScroll);
-  },[]);
-  const links = [["about","About"],["journey","Journey"],["timeline","Timeline"],["faq","FAQ"]];
-  return (
-    <header className={scrolled?'scrolled':''}>
-      <div className="wrap"><nav>
-        <a href="#intro" className="brand"><img src="assets/Image.jpg" alt="Tech-Shodha"/> Tech-ಶೋಧ</a>
-        <div className="navlinks">
-          {links.map(([id,label])=><a key={id} href={"#"+id} className={active===id?'active':''}>{label}</a>)}
-        </div>
-      </nav></div>
-    </header>
-  );
-}
-
-function Countdown(){
-  const [t,setT] = useState({d:'--',h:'--',m:'--',s:'--'});
-  useEffect(()=>{
-    const tick = ()=>{
-      const diff = new Date(CONFIG.eventDateISO) - new Date();
-      if(diff<=0){ setT({d:'00',h:'00',m:'00',s:'00'}); return; }
-      const pad = n=>String(n).padStart(2,'0');
-      setT({ d:pad(Math.floor(diff/86400000)), h:pad(Math.floor(diff/3600000)%24),
-             m:pad(Math.floor(diff/60000)%60), s:pad(Math.floor(diff/1000)%60) });
-    };
-    tick(); const id = setInterval(tick,1000); return ()=>clearInterval(id);
-  },[]);
-  return (
-    <Reveal className="countdown">
-      {[['DAYS',t.d],['HOURS',t.h],['MINS',t.m],['SECS',t.s]].map(([label,val])=>(
-        <div key={label}><span>{val}</span><small>{label}</small></div>
-      ))}
-    </Reveal>
-  );
-}
-
-function IntroVideo(){
-  const videoRef = useRef(null);
-  const [muted, setMuted] = useState(true);
-  const toggleSound = ()=>{
-    const v = videoRef.current; if(!v) return;
-    v.muted = !v.muted; setMuted(v.muted);
-  };
-  return (
-    <section className="intro" id="intro">
-      <video ref={videoRef} autoPlay muted loop playsInline poster="assets/intro-poster.jpg">
-        <source src="assets/VID-20260929-WA0005.mp4" type="video/mp4"/>
-      </video>
-      <div className="fade"></div>
-      <button className="sound-toggle" onClick={toggleSound} aria-label={muted?'Unmute video':'Mute video'}>
-        {muted ? '🔇' : '🔊'}
-      </button>
-      <a className="scroll-cue" href="#hero">
-        <span>SCROLL</span>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 4v16m0 0l-6-6m6 6l6-6"/></svg>
-      </a>
-    </section>
-  );
-}
-
-function Hero(){
-  return (
-    <section className="hero" id="hero"><div className="wrap">
-      <Reveal className="badge-row">
-        <span className="chip">VVCE, MYSURU</span>
-        <span className="chip">Ideas Beyond Classrooms</span>
-        <span className="chip">Dates <b>{CONFIG.dateLabel}</b></span>
-      </Reveal>
-      <Reveal className="logo-stage" delay={.1}>
-        <div className="logo-glow"></div>
-        <img src="assets/Image.jpg" alt="Tech-ಶೋಧ — A Hackathon for a Brighter Tomorrow"/>
-      </Reveal>
-      <Reveal as="p" className="lead" delay={.2}>A hackathon where curiosity turns into code. Explore real problems, build working solutions, solve under pressure, and evolve your idea beyond the classroom.</Reveal>
-      <Reveal className="hero-cta" delay={.3}>
-        <a className="btn btn-ghost" href="#about">Explore Details</a>
-      </Reveal>
-      <Countdown/>
-    </div></section>
-  );
-}
-
-function About(){
-  const rows = [["Format","In-person"],["Team Size",CONFIG.teamSize],["Duration",CONFIG.duration],["Venue",CONFIG.venue],["Prize Pool",CONFIG.prizePool]];
-  return (
-    <section id="about"><div className="wrap about-grid">
-      <Reveal>
-        <p className="kicker">ABOUT THE HACKATHON</p>
-        <h2>Built by students, for the builders of tomorrow.</h2>
-        <p>Tech-ಶೋಧ is more than a competition — it's a space where students step outside the syllabus and build something that matters. Over one intense stretch of time, teams take a real problem from a rough idea to a working prototype.</p>
-        <p>Whether you're a first-time hacker or a seasoned builder, this is your platform to explore emerging tech, ship fast, and walk away with something you actually made.</p>
-        <a className="btn btn-ghost btn-sm" href="#timeline">See the schedule</a>
-      </Reveal>
-      <Reveal className="about-visual" delay={.15}>
-        {rows.map(([k,v])=><div className="row" key={k}><span>{k}</span><span>{v}</span></div>)}
-      </Reveal>
-    </div></section>
-  );
-}
-
-function Journey(){
-  return (
-    <section id="journey"><div className="wrap">
-      <Reveal className="section-head">
-        <p className="kicker">THE JOURNEY</p>
-        <h2>Four stages. One path to the finish line.</h2>
-        <p>Every team moves through the same journey — how far you push each stage is what sets you apart.</p>
-      </Reveal>
-      <div className="journey">
-        {CONFIG.journey.map(([num,title,desc,color],i)=>(
-          <Reveal as="div" key={num} className="stage" data-c={color} delay={i*0.08}>
-            <div className="num">{num}</div><h3>{title}</h3><p>{desc}</p>
-          </Reveal>
-        ))}
-      </div>
-    </div></section>
-  );
-}
-
-function useCountUp(target, active){
-  const [val,setVal] = useState(0);
-  useEffect(()=>{
-    if(!active) return;
-    const t0 = performance.now(), dur=1200;
-    const step = t=>{ const p=Math.min((t-t0)/dur,1);
-      setVal(Math.floor(target*(1-Math.pow(1-p,3)))); if(p<1) requestAnimationFrame(step); };
-    requestAnimationFrame(step);
-  },[active]);
-  return val;
-}
-function Stats(){
-  const ref = useRef(null); const [inView,setInView] = useState(false);
-  useEffect(()=>{
-    const io = new IntersectionObserver(([e])=>{ if(e.isIntersecting){ setInView(true); io.disconnect(); } },{threshold:.5});
-    if(ref.current) io.observe(ref.current); return ()=>io.disconnect();
-  },[]);
-  const hours = useCountUp(parseInt(CONFIG.duration)||24, inView);
-  return (
-    <section id="stats"><div className="wrap" ref={ref}>
-      <Reveal className="stats">
-        <div className="stat"><b>{hours}</b><span>Hours of Building</span></div>
-        <div className="stat"><b>{CONFIG.teamSize.replace(/\D+/g,'-').replace(/^-|-$/g,'')}</b><span>Members per Team</span></div>
-        <div className="stat"><b>{CONFIG.prizePool}</b><span>Prize Pool</span></div>
-        <div className="stat"><b>1</b><span>Campus, VVCE Mysuru</span></div>
-      </Reveal>
-    </div></section>
-  );
-}
-
-function Timeline(){
-  return (
-    <section id="timeline"><div className="wrap">
-      <Reveal className="section-head">
-        <p className="kicker">EVENT FLOW</p><h2>From sign-up to the final demo.</h2>
-      </Reveal>
-      <div className="tl">
-        {CONFIG.timeline.map((item,i)=>(
-          <Reveal as="div" key={item.title} className="tl-item" delay={i*0.08}>
-            <div className="date mono">{item.date}</div><h3>{item.title}</h3><p>{item.desc}</p>
-          </Reveal>
-        ))}
-      </div>
-    </div></section>
-  );
-}
-
-function FAQ(){
-  return (
-    <section id="faq"><div className="wrap">
-      <Reveal className="section-head">
-        <p className="kicker">GOT QUESTIONS?</p><h2>Frequently asked questions</h2>
-      </Reveal>
-      <div className="faq">
-        {CONFIG.faq.map(([q,a],i)=>(
-          <Reveal as="details" key={q} delay={i*0.06} open={i===0?true:undefined}>
-            <summary>{q}</summary><p>{a}</p>
-          </Reveal>
-        ))}
-      </div>
-    </div></section>
-  );
-}
-
-function CTA(){
-  return (
-    <section id="register"><div className="wrap">
-      <Reveal className="cta-band">
-        <h2>Ready to build something that matters?</h2>
-        <p>Seats are limited — register your team before the window closes.</p>
-        <MagBtn className="btn btn-primary" href={CONFIG.registrationFormUrl}>Register Your Team →</MagBtn>
-      </Reveal>
-    </div></section>
-  );
-}
-
-function Footer(){
-  return (
-    <footer><div className="wrap">
-      <div className="foot-grid">
-        <div className="foot-col"><h4>TECH-ಶೋಧ</h4>
-          <p style={{color:'var(--muted)',maxWidth:220}}>A hackathon for a brighter tomorrow, hosted by VVCE, Mysuru.</p></div>
-        <div className="foot-col"><h4>CONTACT</h4>
-          <a href="mailto:techshodha@vvce.ac.in">techshodha@vvce.ac.in</a>
-          <p style={{color:'var(--muted)'}}>VVCE, Gokulam 3rd Stage, Mysuru</p></div>
-        <div className="foot-col"><h4>QUICK LINKS</h4>
-          <a href="#about">About</a><a href="#journey">Journey</a><a href="#timeline">Timeline</a><a href="#faq">FAQ</a></div>
-      </div>
-      <div className="foot-bottom">
-        <span>© {new Date().getFullYear()} Tech-ಶೋಧ, VVCE Mysuru. All rights reserved.</span>
-        <span>Explore · Build · Solve · Evolve</span>
-      </div>
-    </div></footer>
-  );
-}
-
-function App(){
-  const active = useSectionSpy(['intro','hero','about','journey','timeline','faq','register']);
-  return (
-    <React.Fragment>
-      <ProgressBar/><CustomCursor/><BackgroundArt/>
-      <Header active={active}/>
-      <SideNav active={active}/>
-      <main><IntroVideo/><Hero/><About/><Journey/><Stats/><Timeline/><FAQ/><CTA/></main>
-      <Footer/>
-    </React.Fragment>
-  );
-}
-
-ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
-</script>
-</body>
-</html>
+    function onLeave
