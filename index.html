@@ -147,6 +147,20 @@
   .cta-band h2{font-size:clamp(24px,3.4vw,34px);margin-bottom:14px;}
   .cta-band p{color:var(--muted);margin-bottom:30px;}
 
+  /* ---- innovation domains ---- */
+  .domains-grid{display:grid;grid-template-columns:1fr 1fr;gap:36px;}
+  .domain-card{border:1px solid var(--line);border-radius:20px;padding:30px;background:linear-gradient(160deg,var(--panel),transparent);}
+  .domain-card h3{font-size:19px;margin-bottom:4px;display:flex;align-items:center;gap:10px;}
+  .domain-card h3 .dot{width:9px;height:9px;border-radius:50%;flex:none;}
+  .domain-card .sub{color:var(--muted);font-size:13px;margin-bottom:20px;}
+  .domain-tags{display:flex;flex-wrap:wrap;gap:10px;}
+  .domain-tag{border:1px solid var(--line);background:rgba(255,255,255,.03);border-radius:999px;
+    padding:8px 16px;font-size:13px;color:var(--ink);transition:border-color .25s,transform .25s,background .25s;}
+  .domain-tag:hover{transform:translateY(-2px);}
+  .domain-card.hw .domain-tag:hover{border-color:var(--cyan);background:rgba(62,230,242,.08);}
+  .domain-card.sw .domain-tag:hover{border-color:var(--violet);background:rgba(155,107,255,.08);}
+  @media(max-width:880px){.domains-grid{grid-template-columns:1fr;}}
+
   footer{border-top:1px solid var(--line);padding:52px 0 30px;position:relative;z-index:1;}
   .foot-grid{display:flex;justify-content:space-between;flex-wrap:wrap;gap:30px;margin-bottom:34px;}
   .foot-col h4{font-size:13px;color:var(--muted);letter-spacing:.06em;margin-bottom:14px;}
@@ -217,7 +231,11 @@ const CONFIG = {
     ["02","Build","Turn your concept into a working prototype with your team and the tools on hand.","violet"],
     ["03","Solve","Stress-test the rough edges and get your build to actually work under pressure.","magenta"],
     ["04","Evolve","Present your solution, take the feedback, and carry the idea beyond the classroom.","amber"]
-  ]
+  ],
+  domains: {
+    hardware: ["IoT","Embedded Systems","Agri Tech","Health Care","Disaster Management","Robotics and Automation","Security and Surveillance","Sports and Fitness","Waste Management","Smart City"],
+    software: ["Education","AgriTech","Cybersecurity","AI and Machine Learning","Health Care & Wellness Technology","Blockchain","Automation and Intelligent Systems","Next Gen AI","FinTech and Digital Payments","Computer Vision and Image Intelligence"]
+  }
 };
 /* ================================================= */
 
@@ -256,8 +274,7 @@ function BackgroundArt(){
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const colors = ['62,230,242', '155,107,255', '255,95,168'];
     let w,h,dpr,particles,raf,mouse={x:-9999,y:-9999};
-
-    function sized(){
+function sized(){
       dpr = Math.min(window.devicePixelRatio||1, 2);
       w = canvas.clientWidth; h = canvas.clientHeight;
       canvas.width = w*dpr; canvas.height = h*dpr;
@@ -387,7 +404,7 @@ function useSectionSpy(ids){
 }
 
 function SideNav({active}){
-  const items = [["intro","Intro"],["hero","Home"],["about","About"],["journey","Journey"],["timeline","Timeline"],["faq","FAQ"],["register","Register"]];
+  const items = [["intro","Intro"],["hero","Home"],["about","About"],["journey","Journey"],["timeline","Timeline"],["domains","Domains"],["faq","FAQ"],["register","Register"]];
   return (
     <nav className="side-nav">
       {items.map(([id,label])=>(
@@ -405,7 +422,7 @@ function Header({active}){
     window.addEventListener('scroll', onScroll, {passive:true});
     return ()=>window.removeEventListener('scroll', onScroll);
   },[]);
-  const links = [["about","About"],["journey","Journey"],["timeline","Timeline"],["faq","FAQ"]];
+  const links = [["about","About"],["journey","Journey"],["timeline","Timeline"],["domains","Domains"],["faq","FAQ"]];
   return (
     <header className={scrolled?'scrolled':''}>
       <div className="wrap"><nav>
@@ -449,7 +466,7 @@ function IntroVideo(){
   return (
     <section className="intro" id="intro">
       <video ref={videoRef} autoPlay muted loop playsInline webkit-playsinline="true" poster="assets/intro-poster.jpg">
-        <source src="assets/VID-20260929-WA0025.mp4" type="video/mp4"/>
+        <source src="assets/VID-20260929-WA0005.mp4" type="video/mp4"/>
       </video>
       <div className="fade"></div>
       <button className="sound-toggle" onClick={toggleSound} aria-label={muted?'Unmute video':'Mute video'}>
@@ -568,6 +585,34 @@ function Timeline(){
   );
 }
 
+function Domains(){
+  return (
+    <section id="domains"><div className="wrap">
+      <Reveal className="section-head">
+        <p className="kicker">SELECT INNOVATION DOMAIN</p>
+        <h2>Pick the track that fits your idea.</h2>
+        <p>Choose one domain when you register — a Hardware track or a Software track, whichever your team builds toward.</p>
+      </Reveal>
+      <div className="domains-grid">
+        <Reveal className="domain-card hw" delay={0}>
+          <h3><span className="dot" style={{background:'var(--cyan)'}}></span>For Hardware</h3>
+          <p className="sub">Physical builds, IoT, and on-ground systems.</p>
+          <div className="domain-tags">
+            {CONFIG.domains.hardware.map(d=><span className="domain-tag" key={d}>{d}</span>)}
+          </div>
+        </Reveal>
+        <Reveal className="domain-card sw" delay={.1}>
+          <h3><span className="dot" style={{background:'var(--violet)'}}></span>For Software</h3>
+          <p className="sub">Apps, platforms, and intelligent systems.</p>
+          <div className="domain-tags">
+            {CONFIG.domains.software.map(d=><span className="domain-tag" key={d}>{d}</span>)}
+          </div>
+        </Reveal>
+      </div>
+    </div></section>
+  );
+}
+
 function FAQ(){
   return (
     <section id="faq"><div className="wrap">
@@ -618,13 +663,13 @@ function Footer(){
 }
 
 function App(){
-  const active = useSectionSpy(['intro','hero','about','journey','timeline','faq','register']);
+  const active = useSectionSpy(['intro','hero','about','journey','timeline','domains','faq','register']);
   return (
     <React.Fragment>
       <ProgressBar/><CustomCursor/><BackgroundArt/>
       <Header active={active}/>
       <SideNav active={active}/>
-      <main><IntroVideo/><Hero/><About/><Journey/><Stats/><Timeline/><FAQ/><CTA/></main>
+      <main><IntroVideo/><Hero/><About/><Journey/><Stats/><Timeline/><Domains/><FAQ/><CTA/></main>
       <Footer/>
     </React.Fragment>
   );
@@ -634,3 +679,4 @@ ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
 </body>
 </html>
+    
